@@ -25,7 +25,11 @@ fs.mkdirSync(talksPath);
 fs.mkdirSync(speakersPath);
 fs.mkdirSync(sponsorsPath);
 
-const approvedTalks = talks.Results.filter(t => t.Status === 'Approved');
+const approvedTalks = talks.Results.filter(t => t.Status === 'Approved').map(
+  talk => {
+    return { ...talk, Author: talk.Author === '' ? 'Unknown' : talk.Author };
+  }
+);
 
 // extract speakers from talks
 const eventSpeakers = approvedTalks.map(talk => {
