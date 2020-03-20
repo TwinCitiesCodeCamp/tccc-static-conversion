@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const { format } = require('date-fns');
+const { format, setHours, setMinutes } = require('date-fns');
 const events = require('./../json-archive/events');
 const talks = require('./../json-archive/talks');
 const sponsors = require('./../json-archive/sponsors');
@@ -120,7 +120,7 @@ title: "${cleanseBio(talk.Title.split('\n').join(' '))}"
 speaker: ${speakerid}
 layout: talk
 room: ${talk.Room}
-time: ${talk.Hour}
+time: ${getTime(talk.Hour)}
 ---
 ${talk.Abstract}`;
 
@@ -134,7 +134,7 @@ talksFiles.forEach(async file => {
   await fs.ensureDir(folder);
 
   fs.writeFileSync(`${folder}/${fileName}`, content);
-  console.log(fileName);
+  // console.log(fileName);
 });
 
 function getTalkFileName(talk) {
@@ -180,4 +180,14 @@ function getTwitterString(t) {
   if (!t) return '';
   if (t.charAt(0) === '@') return getYamlString(t.substring(1));
   return getYamlString(t);
+}
+
+function getTime(hour) {
+  if (!hour) return '';
+  const hourNumber = parseFloat(hour);
+  if (hourNumber === 0) return '';
+  const minutes = (hourNumber % 1) * 60;
+  const now = new Date();
+  const newDate = setMinutes(setHours(now, hour), minutes);
+  return format(newDate, 'h:mm bbbb');
 }
