@@ -19,14 +19,12 @@ fs.mkdirSync('out');
 
 // ensure paths
 const eventsContentPath = 'out/events-content';
-const dataPath = 'out/_data';
 const eventsPath = `${eventsContentPath}/_events`;
 const talksPath = `${eventsContentPath}/_talks`;
 const speakersPath = `${eventsContentPath}/_speakers`;
 const sponsorsPath = `${eventsContentPath}/_sponsors`;
 
 fs.mkdirSync(eventsContentPath);
-fs.mkdirSync(dataPath);
 fs.mkdirSync(eventsPath);
 fs.mkdirSync(talksPath);
 fs.mkdirSync(speakersPath);
