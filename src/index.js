@@ -1,10 +1,17 @@
 const fs = require('fs-extra');
-const { format, setHours, setMinutes } = require('date-fns');
+const { format } = require('date-fns');
 const events = require('./../json-archive/events');
 const talks = require('./../json-archive/talks');
 const sponsors = require('./../json-archive/sponsors');
-const htmlencode = require('htmlencode');
-const htmlencoder = new htmlencode.Encoder('numerical');
+const {
+  cleanseLongText,
+  removeExtraSpaces,
+  removeDoubleUnderscores,
+  getTime
+} = require('./util');
+
+const createSpeakerFiles = require('./createSpeakerFiles');
+const createSponsorFiles = require('./createSponsorFiles');
 
 // delete everything under out
 fs.removeSync('out');
@@ -15,8 +22,8 @@ const eventsContentPath = 'out/events-content';
 const dataPath = 'out/_data';
 const eventsPath = `${eventsContentPath}/_events`;
 const talksPath = `${eventsContentPath}/_talks`;
-const speakersPath = `${dataPath}/speakers`;
-const sponsorsPath = `${dataPath}/sponsors`;
+const speakersPath = `${eventsContentPath}/_speakers`;
+const sponsorsPath = `${eventsContentPath}/_sponsors`;
 
 fs.mkdirSync(eventsContentPath);
 fs.mkdirSync(dataPath);
@@ -32,7 +39,7 @@ const approvedTalks = talks.Results.filter(t => t.Status === 'Approved').map(
 );
 
 // extract speakers from talks
-const eventSpeakers = approvedTalks.map(talk => {
+const eventSpeakerMap = approvedTalks.map(talk => {
   return {
     eventId: `tccc${talk.EventId.split('/')[1]}`,
     speakerId: talk.Author.split(' ').join(''),
@@ -47,50 +54,10 @@ const eventSpeakers = approvedTalks.map(talk => {
   };
 });
 
-const distinctEvents = [...new Set(eventSpeakers.map(s => s.eventId))];
+const distinctEvents = [...new Set(eventSpeakerMap.map(s => s.eventId))];
 
-// create speaker event files
-distinctEvents.forEach(eventId => {
-  const speakersForEvent = eventSpeakers.filter(
-    speaker => speaker.eventId === eventId
-  );
-
-  const speakerData = speakersForEvent.map(s => {
-    return `${s.speakerId}:
-  name: ${s.name}
-  image: ${getYamlString(s.image)}
-  bio: "${removeLineBreaks(cleanseLongText(s.bio))}"
-  speakerUrl: ${getYamlString(s.url)}
-  twitter: ${getTwitterString(s.twitter)}
-  github: ${getYamlString(s.github)}
-  event: ${eventId}`;
-  });
-  const speakerFileContent = speakerData.join('\n\n');
-  const filePath = `${speakersPath}/${eventId}.yml`;
-  fs.writeFileSync(filePath, speakerFileContent);
-  console.log(filePath);
-});
-
-// create sponsor event files
-distinctEvents.forEach(eventId => {
-  const sponsorsForEvent = sponsors.Results.filter(
-    sponsor => 'tccc' + sponsor.EventId.split('/')[1] === eventId
-  );
-
-  const sponsorData = sponsorsForEvent.map(s => {
-    return `- name: ${s.Name}
-  level: ${s.Level}
-  image: ${s.Logo}
-  link: ${s.Url}
-  twitter: ${getTwitterString(s.Twitter)}
-  description: "${cleanseLongText(s.About)}"`;
-  });
-
-  const sponsorFileContent = sponsorData.join('\n\n');
-  const filePath = `${sponsorsPath}/${eventId}.yml`;
-  fs.writeFileSync(filePath, sponsorFileContent);
-  console.log(filePath);
-});
+createSpeakerFiles(distinctEvents, eventSpeakerMap, speakersPath);
+createSponsorFiles(distinctEvents, sponsors.Results, sponsorsPath);
 
 const eventsFiles = events.Results.map(e => {
   const number = e.Number;
@@ -114,7 +81,7 @@ eventsFiles.forEach(file => {
 const talksFiles = approvedTalks.map(talk => {
   const fileName = getTalkFileName(talk);
   const eventString = `tccc${talk.EventId.split('/')[1]}`;
-  const speakerid = eventSpeakers.find(
+  const speakerid = eventSpeakerMap.find(
     e => e.eventId === eventString && e.talkId === talk['@metadata']['@id']
   ).speakerId;
 
@@ -162,45 +129,4 @@ function getTalkFileName(talk) {
   );
 
   return `${cleanAuthor}_${cleanTitle}.html`;
-}
-
-function removeExtraSpaces(string) {
-  return string.replace(/  +/g, ' ');
-}
-
-function removeDoubleUnderscores(string) {
-  return string.replace(/_+/g, '_');
-}
-
-function removeLineBreaks(string) {
-  return string.replace(/\n+/g, '');
-}
-
-function cleanseLongText(text) {
-  return removeExtraSpaces(
-    text
-      .trim()
-      .split('"')
-      .join('&quot;')
-  );
-}
-
-function getYamlString(att) {
-  return !att ? '' : `${att}`;
-}
-
-function getTwitterString(t) {
-  if (!t) return '';
-  if (t.charAt(0) === '@') return getYamlString(t.substring(1));
-  return getYamlString(t);
-}
-
-function getTime(hour) {
-  if (!hour) return '';
-  const hourNumber = parseFloat(hour);
-  if (hourNumber === 0) return '';
-  const minutes = (hourNumber % 1) * 60;
-  const now = new Date();
-  const newDate = setMinutes(setHours(now, hour), minutes);
-  return format(newDate, 'h:mm bbbb');
 }
