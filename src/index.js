@@ -59,7 +59,7 @@ distinctEvents.forEach(eventId => {
     return `${s.speakerId}:
   name: ${s.name}
   image: ${getYamlString(s.image)}
-  bio: "${cleanseBio(s.bio)}"
+  bio: "${removeLineBreaks(cleanseLongText(s.bio))}"
   speakerUrl: ${getYamlString(s.url)}
   twitter: ${getTwitterString(s.twitter)}
   github: ${getYamlString(s.github)}
@@ -83,7 +83,7 @@ distinctEvents.forEach(eventId => {
   image: ${s.Logo}
   link: ${s.Url}
   twitter: ${getTwitterString(s.Twitter)}
-  description: "${cleanseBio(s.About)}"`;
+  description: "${cleanseLongText(s.About)}"`;
   });
 
   const sponsorFileContent = sponsorData.join('\n\n');
@@ -120,7 +120,7 @@ const talksFiles = approvedTalks.map(talk => {
 
   const content = `---
 event: ${eventString}
-title: "${cleanseBio(talk.Title.split('\n').join(' '))}"
+title: "${cleanseLongText(talk.Title.split('\n').join(' '))}"
 speaker: ${speakerid}
 layout: talk
 room: ${talk.Room}
@@ -172,8 +172,17 @@ function removeDoubleUnderscores(string) {
   return string.replace(/_+/g, '_');
 }
 
-function cleanseBio(bio) {
-  return removeExtraSpaces(htmlencoder.htmlEncode(bio.trim()));
+function removeLineBreaks(string) {
+  return string.replace(/\n+/g, '');
+}
+
+function cleanseLongText(text) {
+  return removeExtraSpaces(
+    text
+      .trim()
+      .split('"')
+      .join('&quot;')
+  );
 }
 
 function getYamlString(att) {
