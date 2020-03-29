@@ -43,7 +43,7 @@ ${s.bio}`;
 
       const path = `${folder}/${fileName}`;
       fs.writeFileSync(path, content);
-      console.log(path);
+      //console.log(path);
     });
   });
 };

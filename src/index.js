@@ -20,6 +20,7 @@ const talksPath = `${eventsContentPath}/_talks`;
 const speakersPath = `${eventsContentPath}/_speakers`;
 const sponsorsPath = `${eventsContentPath}/_sponsors`;
 const speakerImagesPath = `out/assets/images/speakers`;
+const sponsorImagesPath = `out/assets/images/sponsors`;
 
 fs.mkdirSync(eventsContentPath);
 fs.mkdirSync(eventsPath);
@@ -27,6 +28,7 @@ fs.mkdirSync(talksPath);
 fs.mkdirSync(speakersPath);
 fs.mkdirSync(sponsorsPath);
 fs.ensureDirSync(speakerImagesPath);
+fs.ensureDirSync(sponsorImagesPath);
 
 const approvedTalks = talks.Results.filter(
   t => t.Status === 'Approved' && t.EventId !== 'events/24'
@@ -58,7 +60,12 @@ createSpeakerFiles(
   speakersPath,
   speakerImagesPath
 );
-createSponsorFiles(distinctEvents, sponsors.Results, sponsorsPath);
+createSponsorFiles(
+  distinctEvents,
+  sponsors.Results,
+  sponsorsPath,
+  sponsorImagesPath
+);
 createEventFiles(
   events.Results.filter(e => e.Number !== 24),
   eventsPath

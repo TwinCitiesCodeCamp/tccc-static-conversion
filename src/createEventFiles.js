@@ -23,7 +23,7 @@ seasonYear: "${e.SeasonYear}"
   eventsFiles.forEach(file => {
     const { fileName, content } = file;
     fs.writeFileSync(`${eventsPath}/${fileName}`, content);
-    console.log(`${fileName}`);
+    //console.log(`${fileName}`);
   });
 };
 

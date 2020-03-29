@@ -45,6 +45,20 @@ function getTime(hour) {
   return format(newDate, 'h:mm aaa');
 }
 
+function getDownloadUrl(url) {
+  if (url.indexOf('/Content') === 0) {
+    return 'http://twincitiescodecamp.com' + url;
+  }
+
+  if (url.indexOf('../../Content') === 0) {
+    return (
+      'http://twincitiescodecamp.com' + url.replace('../../Content', '/Content')
+    );
+  }
+
+  return url;
+}
+
 module.exports = {
   getTime,
   getTwitterString,
@@ -53,5 +67,6 @@ module.exports = {
   removeLineBreaks,
   removeDoubleUnderscores,
   removeExtraSpaces,
-  removeDoubleDashes
+  removeDoubleDashes,
+  getDownloadUrl
 };
