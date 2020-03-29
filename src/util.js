@@ -42,7 +42,7 @@ function getTime(hour) {
   const minutes = (hourNumber % 1) * 60;
   const now = new Date();
   const newDate = setMinutes(setHours(now, hour), minutes);
-  return format(newDate, 'h:mm bbbb');
+  return format(newDate, 'h:mm aaa');
 }
 
 module.exports = {
