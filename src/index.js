@@ -15,7 +15,7 @@ fs.removeSync('out');
 fs.mkdirSync('out');
 
 // ensure paths
-const eventsContentPath = 'out/events-content';
+const eventsContentPath = 'out/_collections';
 const eventsPath = `${eventsContentPath}/_events`;
 const talksPath = `${eventsContentPath}/_talks`;
 const speakersPath = `${eventsContentPath}/_speakers`;
@@ -27,11 +27,11 @@ fs.mkdirSync(talksPath);
 fs.mkdirSync(speakersPath);
 fs.mkdirSync(sponsorsPath);
 
-const approvedTalks = talks.Results.filter(t => t.Status === 'Approved').map(
-  talk => {
-    return { ...talk, Author: talk.Author === '' ? 'Unknown' : talk.Author };
-  }
-);
+const approvedTalks = talks.Results.filter(
+  t => t.Status === 'Approved' && t.EventId !== 'events/24'
+).map(talk => {
+  return { ...talk, Author: talk.Author === '' ? 'Unknown' : talk.Author };
+});
 
 // extract speakers from talks
 const eventSpeakerMap = approvedTalks.map(talk => {
@@ -53,5 +53,8 @@ const distinctEvents = [...new Set(eventSpeakerMap.map(s => s.eventId))];
 
 createSpeakerFiles(distinctEvents, eventSpeakerMap, speakersPath);
 createSponsorFiles(distinctEvents, sponsors.Results, sponsorsPath);
-createEventFiles(events.Results, eventsPath);
+createEventFiles(
+  events.Results.filter(e => e.Number !== 24),
+  eventsPath
+);
 createTalksFiles(approvedTalks, eventSpeakerMap, talksPath);

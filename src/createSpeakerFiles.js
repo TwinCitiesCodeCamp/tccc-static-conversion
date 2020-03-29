@@ -29,10 +29,7 @@ ${s.bio}`;
 
       const folder = `${speakersPath}/${eventId}`;
       fs.ensureDirSync(folder);
-      const fileName = `${name
-        .split(' ')
-        .join('-')
-        .toLowerCase()}.html`;
+      const fileName = `${name.split(' ').join('')}.html`;
 
       const path = `${folder}/${fileName}`;
       fs.writeFileSync(path, content);

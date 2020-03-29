@@ -8,6 +8,10 @@ function removeDoubleUnderscores(string) {
   return string.replace(/_+/g, '_');
 }
 
+function removeDoubleDashes(string) {
+  return string.replace(/-+/g, '-');
+}
+
 function removeLineBreaks(string) {
   return string.replace(/\n+/g, '');
 }
@@ -48,5 +52,6 @@ module.exports = {
   cleanseLongText,
   removeLineBreaks,
   removeDoubleUnderscores,
-  removeExtraSpaces
+  removeExtraSpaces,
+  removeDoubleDashes
 };

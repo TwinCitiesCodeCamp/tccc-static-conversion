@@ -3,7 +3,7 @@ const {
   cleanseLongText,
   getTime,
   removeExtraSpaces,
-  removeDoubleUnderscores
+  removeDoubleDashes
 } = require('./util');
 
 const createTalksFiles = (approvedTalks, eventSpeakerMap, talksPath) => {
@@ -17,7 +17,7 @@ const createTalksFiles = (approvedTalks, eventSpeakerMap, talksPath) => {
     const content = `---
 event: ${eventString}
 title: "${cleanseLongText(talk.Title.split('\n').join(' '))}"
-speaker: ${speakerid}
+speakerId: ${speakerid}
 layout: talk
 room: ${talk.Room}
 time: ${getTime(talk.Hour)}
@@ -42,23 +42,23 @@ ${talk.Abstract}`;
     const title = removeExtraSpaces(talk.Title.trim());
     const author = removeExtraSpaces(talk.Author.trim());
 
-    const cleanTitle = removeDoubleUnderscores(
+    const cleanTitle = removeDoubleDashes(
       title
+        .replace(/\W/g, ' ')
         .split(' ')
-        .join('_')
-        .replace(/\W/g, '')
+        .join('-')
         .toLowerCase()
     );
 
-    const cleanAuthor = removeDoubleUnderscores(
+    const cleanAuthor = removeDoubleDashes(
       author
+        .replace(/\W/g, ' ')
         .split(' ')
-        .join('_')
-        .replace(/\W/g, '')
+        .join('-')
         .toLowerCase()
     );
 
-    return `${cleanAuthor}_${cleanTitle}.html`;
+    return `${cleanAuthor}-${cleanTitle}.html`;
   }
 };
 
