@@ -1,5 +1,4 @@
 const fs = require('fs-extra');
-const { format } = require('date-fns');
 const events = require('./../json-archive/events');
 const talks = require('./../json-archive/talks');
 const sponsors = require('./../json-archive/sponsors');
@@ -20,12 +19,14 @@ const eventsPath = `${eventsContentPath}/_events`;
 const talksPath = `${eventsContentPath}/_talks`;
 const speakersPath = `${eventsContentPath}/_speakers`;
 const sponsorsPath = `${eventsContentPath}/_sponsors`;
+const speakerImagesPath = `out/assets/images/speakers`;
 
 fs.mkdirSync(eventsContentPath);
 fs.mkdirSync(eventsPath);
 fs.mkdirSync(talksPath);
 fs.mkdirSync(speakersPath);
 fs.mkdirSync(sponsorsPath);
+fs.ensureDirSync(speakerImagesPath);
 
 const approvedTalks = talks.Results.filter(
   t => t.Status === 'Approved' && t.EventId !== 'events/24'
@@ -51,7 +52,12 @@ const eventSpeakerMap = approvedTalks.map(talk => {
 
 const distinctEvents = [...new Set(eventSpeakerMap.map(s => s.eventId))];
 
-createSpeakerFiles(distinctEvents, eventSpeakerMap, speakersPath);
+createSpeakerFiles(
+  distinctEvents,
+  eventSpeakerMap,
+  speakersPath,
+  speakerImagesPath
+);
 createSponsorFiles(distinctEvents, sponsors.Results, sponsorsPath);
 createEventFiles(
   events.Results.filter(e => e.Number !== 24),
